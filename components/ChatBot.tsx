@@ -1,22 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { GoogleGenAI } from "@google/genai";
 import { MessageCircle, X, Send, Sparkles, Loader2, Minimize2 } from 'lucide-react';
 import { User } from '../types';
+import { sendMessageToGemini, ChatMessage } from '../services/gemini';
 
 interface Props {
   user: User;
 }
 
-interface Message {
-  role: 'user' | 'model';
-  text: string;
-}
-
 const ChatBot: React.FC<Props> = ({ user }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', text: `¡Hola ${user.name.split(' ')[0]}! 👋 Soy Fidelia, tu asistente virtual. Puedo ayudarte a consultar tu saldo, explicarte cómo ganar más puntos o darte información sobre tus beneficios nivel ${user.tier || 'Estándar'}. ¿En qué te ayudo hoy?` }
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    { role: 'model', text: `¡Hola ${user.name.split(' ')[0]}! 👋 Soy Fidelia. Puedo ayudarte con tu saldo, premios o dudas sobre la app. ¿En qué te ayudo hoy?` }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -37,55 +32,15 @@ const ChatBot: React.FC<Props> = ({ user }) => {
     setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
     setIsLoading(true);
 
-    try {
-      const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY });
-      
-      const systemInstruction = `
-        Eres Fidelia, la asistente de inteligencia artificial amigable y entusiasta de "Fidelia App".
-        
-        CONTEXTO DEL USUARIO ACTUAL:
-        - Nombre: ${user.name}
-        - Puntos actuales: ${user.points}
-        - Nivel de lealtad: ${user.tier || 'Estándar'}
-        
-        SOBRE LA APP:
-        - Fidelia App premia la lealtad de los clientes.
-        - Los usuarios ganan puntos registrando sus compras (subiendo foto del ticket o manual).
-        - 1 punto se gana aproximadamente por cada $1,000 pesos de compra (depende de configuración).
-        - Los puntos se canjean por premios en el catálogo.
-        - Existen "Tarjetas de Sellos" digitales (ej: compra 10 cafés, lleva 1 gratis).
-        
-        TU PERSONALIDAD:
-        - Eres útil, breve y usas emojis ocasionalmente.
-        - Si te preguntan por saldo, usa el dato del contexto.
-        - Si preguntan cómo ganar puntos, explica la opción "Registrar Compra".
-        - Si preguntan por premios, invítalos a ver la pestaña "Premios".
-        - Responde siempre en Español.
-      `;
+    // Call the service
+    const responseText = await sendMessageToGemini(
+      messages, 
+      userMessage, 
+      { name: user.name, points: user.points, tier: user.tier || 'Estándar' }
+    );
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-pro-preview',
-        contents: [
-            ...messages.map(m => ({ 
-                role: m.role, 
-                parts: [{ text: m.text }] 
-            })),
-            { role: 'user', parts: [{ text: userMessage }] }
-        ],
-        config: {
-          systemInstruction: systemInstruction,
-        }
-      });
-
-      const aiText = response.text || "Lo siento, tuve un problema pensando mi respuesta. ¿Podrías intentar de nuevo?";
-      
-      setMessages(prev => [...prev, { role: 'model', text: aiText }]);
-    } catch (error) {
-      console.error("Error generating response:", error);
-      setMessages(prev => [...prev, { role: 'model', text: "Tuve un pequeño error de conexión. Por favor intenta más tarde." }]);
-    } finally {
-      setIsLoading(false);
-    }
+    setMessages(prev => [...prev, { role: 'model', text: responseText }]);
+    setIsLoading(false);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -167,7 +122,7 @@ const ChatBot: React.FC<Props> = ({ user }) => {
               </button>
             </div>
             <div className="text-center mt-2">
-                <span className="text-[10px] text-gray-400">Powered by Gemini 3 Pro</span>
+                <span className="text-[10px] text-gray-400">Powered by Google Gemini</span>
             </div>
           </div>
         </div>
