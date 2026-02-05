@@ -49,10 +49,7 @@ const AdminDashboard: React.FC<Props> = ({
 
   const handleOpenApproval = (purchase: Purchase) => {
     setSelectedPurchase(purchase);
-    // Calculate suggested stamps based on settings
-    const suggestedStamps = Math.floor(purchase.amount / settings.amountPerStamp);
-    
-    // Auto-fill stamps for general cards? Or just leave 0 and let admin choose?
+    // Inicializamos sin sellos asignados (es opcional)
     setStampsToAssign({}); 
     setShowApprovalModal(true);
   };
@@ -66,11 +63,16 @@ const AdminDashboard: React.FC<Props> = ({
 
   const confirmApproval = () => {
     if (!selectedPurchase) return;
+    
+    // Filtramos solo las tarjetas que tienen > 0 sellos asignados
     const stampsList = Object.entries(stampsToAssign)
         .filter(([_, count]) => (count as number) > 0)
         .map(([cardId, count]) => ({ cardId: parseInt(cardId), count: count as number }));
     
+    // Llamamos a la función principal para aprobar y asignar
     onApprovePurchase(selectedPurchase, stampsList);
+    
+    // Limpieza
     setShowApprovalModal(false);
     setSelectedPurchase(null);
     setStampsToAssign({});
@@ -283,11 +285,15 @@ const AdminDashboard: React.FC<Props> = ({
                       </div>
 
                       <div className="border-t border-gray-100 pt-6">
-                          <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
-                              <Stamp size={20} className="text-blue-700" /> Asignar Sellos
-                          </h4>
+                          <div className="flex justify-between items-center mb-4">
+                             <h4 className="font-bold text-gray-900 flex items-center gap-2">
+                                <Stamp size={20} className="text-blue-700" /> Asignar Sellos
+                             </h4>
+                             <span className="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">Opcional</span>
+                          </div>
+                          
                           <div className="bg-blue-50 text-blue-800 text-sm p-3 rounded-lg mb-4">
-                             Sugerencia del sistema: <strong>{Math.floor(selectedPurchase.amount / settings.amountPerStamp)} sellos</strong> (1 por cada ${settings.amountPerStamp.toLocaleString()})
+                             Sugerencia: <strong>{Math.floor(selectedPurchase.amount / settings.amountPerStamp)} sellos</strong> (1 por cada ${settings.amountPerStamp.toLocaleString()})
                           </div>
                           <div className="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
                               {loyaltyCards.map(card => (
@@ -318,7 +324,7 @@ const AdminDashboard: React.FC<Props> = ({
 
                   <div className="p-6 bg-gray-50 border-t border-gray-100 flex gap-4 flex-shrink-0">
                       <button onClick={() => setShowApprovalModal(false)} className="flex-1 py-3.5 text-gray-600 font-bold bg-white border border-gray-200 hover:bg-gray-100 rounded-xl transition">Cancelar</button>
-                      <button onClick={confirmApproval} className="flex-1 py-3.5 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 shadow-lg shadow-green-200 transition">Confirmar y Asignar</button>
+                      <button onClick={confirmApproval} className="flex-1 py-3.5 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 shadow-lg shadow-green-200 transition">Confirmar y Aprobar</button>
                   </div>
               </div>
           </div>

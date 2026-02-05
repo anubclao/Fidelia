@@ -236,10 +236,19 @@ const UserDashboard: React.FC<Props> = ({
                      <div className="font-bold text-gray-900">{user.name.split(' ')[0]}</div>
                   </div>
                </div>
-               <button className="relative p-2 bg-white rounded-full shadow-sm" onClick={() => setActiveTab('notifications')}>
-                  <Bell size={20} className="text-gray-600" />
-                  {unreadCount > 0 && <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>}
-               </button>
+               <div className="flex items-center gap-2">
+                   <button 
+                      onClick={logout}
+                      className="p-2 bg-white rounded-full shadow-sm text-gray-500 hover:text-red-600 transition"
+                      aria-label="Cerrar Sesión"
+                   >
+                      <LogOut size={20} />
+                   </button>
+                   <button className="relative p-2 bg-white rounded-full shadow-sm" onClick={() => setActiveTab('notifications')}>
+                      <Bell size={20} className="text-gray-600" />
+                      {unreadCount > 0 && <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>}
+                   </button>
+               </div>
              </>
            ) : (
              <div className="flex items-center gap-4 w-full">
