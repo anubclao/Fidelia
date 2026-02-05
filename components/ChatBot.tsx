@@ -38,7 +38,7 @@ const ChatBot: React.FC<Props> = ({ user }) => {
     setIsLoading(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY });
       
       const systemInstruction = `
         Eres Fidelia, la asistente de inteligencia artificial amigable y entusiasta de "Fidelia App".
