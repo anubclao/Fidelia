@@ -4,7 +4,7 @@ import { StorageService } from '../services/storage';
 import { 
   BarChart2, Bell, Grid, Gift, History, LogOut, CheckCircle, 
   ArrowUpRight, ArrowDownLeft, ShoppingBag, CreditCard, QrCode, Sparkles, ChevronRight, Check, Ticket,
-  PlusCircle, Camera, Upload, Smile, Star, Calendar, Copy, Megaphone, Tag
+  PlusCircle, Camera, Upload, Smile, Star, Calendar, Copy, Megaphone, Tag, ChevronLeft
 } from 'lucide-react';
 import ChatBot from './ChatBot';
 
@@ -225,19 +225,40 @@ const UserDashboard: React.FC<Props> = ({
         
         {/* Mobile Header */}
         <div className="md:hidden flex justify-between items-center mb-8">
-           <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-blue-700 text-white flex items-center justify-center font-bold">
-                 {user.name.charAt(0)}
-              </div>
-              <div>
-                 <div className="text-xs text-gray-500">Hola,</div>
-                 <div className="font-bold text-gray-900">{user.name.split(' ')[0]}</div>
-              </div>
-           </div>
-           <button className="relative p-2 bg-white rounded-full shadow-sm" onClick={() => setActiveTab('notifications')}>
-              <Bell size={20} className="text-gray-600" />
-              {unreadCount > 0 && <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>}
-           </button>
+           {activeTab === 'overview' ? (
+             <>
+               <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-blue-700 text-white flex items-center justify-center font-bold">
+                     {user.name.charAt(0)}
+                  </div>
+                  <div>
+                     <div className="text-xs text-gray-500">Hola,</div>
+                     <div className="font-bold text-gray-900">{user.name.split(' ')[0]}</div>
+                  </div>
+               </div>
+               <button className="relative p-2 bg-white rounded-full shadow-sm" onClick={() => setActiveTab('notifications')}>
+                  <Bell size={20} className="text-gray-600" />
+                  {unreadCount > 0 && <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>}
+               </button>
+             </>
+           ) : (
+             <div className="flex items-center gap-4 w-full">
+               <button 
+                 onClick={() => setActiveTab('overview')}
+                 className="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-gray-700 active:scale-95 transition hover:bg-gray-50"
+               >
+                 <ChevronLeft size={24} />
+               </button>
+               <h2 className="text-xl font-bold text-gray-900">
+                 {activeTab === 'purchases' && 'Mis Compras'}
+                 {activeTab === 'promotions' && 'Promociones'}
+                 {activeTab === 'stamps' && 'Mis Sellos'}
+                 {activeTab === 'rewards' && 'Premios'}
+                 {activeTab === 'notifications' && 'Mensajes'}
+                 {activeTab === 'history' && 'Actividad'}
+               </h2>
+             </div>
+           )}
         </div>
 
         {/* OVERVIEW TAB */}

@@ -2,7 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 
 // Inicialización centralizada del cliente
 // La configuración en vite.config.js inyectará el valor de la variable de entorno aquí
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export interface ChatMessage {
   role: 'user' | 'model';
